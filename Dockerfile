@@ -3,6 +3,8 @@ FROM alpine:3
 ENV S6_OVERLAY_VERSION 2.2.0.1
 ENV S6_OVERLAY_MD5HASH a114568c94d06dc69fdb9d91ed3f7535
 
+RUN apk add --no-cache curl
+
 RUN apk add --no-cache wget ca-certificates && \
 apk --no-cache --update upgrade && \
 cd /tmp && \
@@ -22,8 +24,13 @@ RUN apk add --no-cache \
 
 COPY /etc/ /etc/
 
+COPY discord.sh /bin/discord.sh
+RUN chmod +x /bin/discord.sh
+
 EXPOSE 514/udp
 EXPOSE 601/tcp
 EXPOSE 6514/tcp
+
+VOLUME /var/log
 
 ENTRYPOINT ["/init"]

@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/usr/bin/with-contenv sh
 
 while true
 do
-    echo "] ping from logmonitor..."
-    sleep 10
+    echo "DISCORD_WEBHOOK=${DISCORD_WEBHOOK}" > /.envvars
+    sleep 3600
 done
 

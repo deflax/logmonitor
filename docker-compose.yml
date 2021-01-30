@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  logmonitor:
+    image: logmonitor:latest
+    ports: 
+      - "514:514/udp"
+    volumes:
+      - "./data/logmonitor/log:/var/log"
+    environment:
+      ENABLE_LOCAL: true
+      ENABLE_DISCORD: true
+      DISCORD_WEBHOOK: https://discordapp.com/api/webhooks/CHANGEME
+      ALLOWED_SUBNET: 10.0.0.0/24
+    restart: always
+    networks:
+      - internal
+    labels:
+      - meta.role=logmonitor
+
+networks:
+  internal: {}

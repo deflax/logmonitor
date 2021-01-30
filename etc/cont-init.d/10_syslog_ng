@@ -3,7 +3,7 @@
 CONFD=/etc/syslog-ng/conf.d
 TEMPLATES=/etc/syslog-ng/templates
 
-# enable and configure the SQL destination if SQL_* environment variables are set
+# Setup the SQL destination if SQL_* environment variables are set
 if $(env | grep -q SQL); then
 
 	if [ -z ${SQL_PORT+set} ]; then
@@ -23,8 +23,8 @@ elif [ -f ${CONFD}/d_sql.conf ]; then
 	rm -f ${CONFD}/d_sql.conf
 fi
 
-DO_ENABLE_LOCAL=true
-
+# Setup local template
+DO_ENABLE_LOCAL=false
 if [ ! -z ${ENABLE_LOCAL+set} ]; then
 	case $ENABLE_LOCAL in
 		true|True|TRUE|yes|Yes|YES|1|on|On|ON)
@@ -32,12 +32,34 @@ if [ ! -z ${ENABLE_LOCAL+set} ]; then
 			;;
 	esac
 fi
-
-# enable the local destination if the appropriate environment variable is set
 if ${DO_ENABLE_LOCAL}; then
-	echo "Logging to /var/log/messages ENABLED."
+	echo "Logging to Local ENABLED."
 	cp --remove-destination ${TEMPLATES}/d_local.template ${CONFD}/d_local.conf
+
 else # otherwise make sure it's disabled
-	echo "Logging to /var/log/messages DISABLED."
+	echo "Logging to Local DISABLED."
 	rm -f ${CONFD}/d_local.conf
+fi
+
+# Setup discord template
+DO_ENABLE_DISCORD=false
+if [ ! -z ${ENABLE_DISCORD+set} ]; then
+	case $ENABLE_DISCORD in
+		true|True|TRUE|yes|Yes|YES|1|on|On|ON)
+			DO_ENABLE_DISCORD=true
+			;;
+	esac
+fi
+if ${DO_ENABLE_DISCORD}; then
+	echo "Logging to Discord ENABLED."
+	cp --remove-destination ${TEMPLATES}/d_discord.template ${CONFD}/d_discord.conf
+
+	if [ -z ${ALLOWED_SUBNET+set} ]; then
+		ALLOWED_SUBNET="10.0.0.0/24"
+	fi
+	echo "Allowed network subnet is ${ALLOWED_SUBNET}"
+	sed -i "s:ALLOWED_SUBNET:${ALLOWED_SUBNET}:" ${CONFD}/d_discord.conf
+else # otherwise make sure it's disabled
+	echo "Logging to Discord DISABLED."
+	rm -f ${CONFD}/d_discord.conf
 fi

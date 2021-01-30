@@ -1,0 +1,13 @@
+destination d_discord {
+        program("/bin/discord.sh" mark-mode(none) template("$PRI $HOST $MSGHDR $MSG\n"));
+};
+
+filter allowed_hosts {
+    netmask(ALLOWED_SUBNET);
+};
+
+log {
+        source(s_network);
+        filter(allowed_hosts);
+        destination(d_discord);
+};

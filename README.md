@@ -8,15 +8,22 @@ A small Alpine container running syslog-ng configured to log to `/var/log/messag
 Basic usage with the default local destination:
 
 ```
+docker build -t logmonitor .
+docker run --env WEBHOOK=https://discordapp.com/api/webhooks/... -p 514:514/udp -d --name logmonitor --rm logmonitor:latest ; docker logs logmonitor --follow
+docker stop logmonitor ; docker rm logmonitor
+```
+
+```
 docker run -d --name syslog-ng -p 514:514/udp -p 601:601/tcp -p 6514:6514/tcp logmonitor
 ```
 
-Destinations can be enabled or disabled with environment variables specified with `-e`.
-
-
 ### Environment variables
 
-* `ENABLE_LOCAL` - set `True` to log to `/var/log/messages` in container (default: `False`)
+* `ENABLE_LOCAL` - set `True` to log to `/var/log/system.log` in container (default: `False`)
+* `ENABLE_DISCORD` - set `True` to log to `Discord` in container (default: `False`)
+
+* `ALLOWED_SUBNET` - Define allowed network. (default: `10.0.0.0/24`)
+
 * `SQL_HOST` - the IP or domain of the destination SQL server
 * `SQL_PORT` - the port the destination SQL server runs on (defaults to `3306` if not specified)
 * `SQL_USER` - the user name used to access the destination SQL server
